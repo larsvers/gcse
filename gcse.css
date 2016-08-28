@@ -1,0 +1,194 @@
+/* /Users/lars/viz/projects/gcse/gcse.css */
+
+@font-face {
+	font-family: 'helsinki';
+	src:
+		local('helsinki.ttf'),
+		url('fonts/helsinki.ttf');
+}
+
+.axis path,
+.axis line {
+  fill: none;
+  stroke: none;
+/*	stroke-width: 0px;
+  shape-rendering: crispEdges;*/
+}
+
+.tick > line {
+  stroke: #444;
+	stroke-width: 1px;
+  shape-rendering: crispEdges;
+}
+
+.y.axis text {
+	fill: #444;
+}
+
+
+.lines {
+	fill: none;
+	stroke: #ccc;
+	stroke-width: 1px;
+}
+
+svg text {
+	fill: #ccc;
+	font-size: 0.85em;
+}
+
+body {
+
+	background-color: #444;
+	color: #eee;
+	font-family: helsinki;
+
+}
+
+h1 {
+	text-align: center;
+}
+
+.controls {
+	display: flex;
+	justify-content: center;	
+}
+
+.controls#story {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;	
+	align-items: center;
+}
+
+.story {
+	margin: 5px;
+	width: 20vw;
+}
+
+#text {
+	
+	text-align: center;
+	height: 40px;
+	margin-top: 10px;
+	color: steelblue;
+
+}
+
+
+button {
+	display: inline-block;
+	margin: 5px;
+	padding: .5em;
+	outline: none;
+	color: #333;
+	background-color: rgba(255, 255, 255, .7);
+	border: none;
+	transition: all 0.3s ease;
+	cursor: pointer;
+
+}
+
+.pressed {
+
+	background-color: steelblue;
+	color: #fff;
+
+}
+
+
+span#fontchange {
+	
+	font-size: 0.7em;
+
+}
+
+
+
+
+
+
+.prequel {
+
+	/*display: none;*/
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	
+}
+
+
+#container {
+	display: none;
+	height: 100%;
+	/*display: flex;*/
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+}
+
+.prequel > div {
+
+	margin: 15px;
+	font-size: 2em;
+	color: #444;
+
+}
+
+
+div#preOne {
+
+	font-size: 5em;
+	margin-top: 100px
+
+}
+
+span#smallFont {
+	font-size: 0.6em;
+}
+
+div#preFour {
+	font-size: 3em;
+}
+
+#start {
+	display: none;
+	width: 100px;
+}
+
+
+.cover {
+	width: 100vw;
+	height:120vh;
+	background-color: #fff;
+	z-index: 2;
+	position: absolute;
+	top: 0;
+	left: 0;
+}
+
+
+div.tooltip {
+  position: absolute;        
+	display: inline-block;
+	max-width: 20vw;
+	padding: 10px;
+	font-family: Arial;
+	color: #000;
+  background-color: #fff;
+	border: 1px solid #999;
+	border-radius: 2px;
+	text-align: center;
+  pointer-events: none;
+	opacity: 0;
+	z-index: 2;
+}
+
+
+p.tooltipText {
+	margin-top: 4px;
+	margin-bottom: 4px;
+	font-size: 0.7em;
+	text-align: left;
+}
