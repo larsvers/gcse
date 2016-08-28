@@ -79,7 +79,7 @@ vis.story = (function() {
 
 	my.prequel = function() {
 		
-		var del = 100;
+		var del = 1000;
 
 		d3.select('#preOne')
 				.transition()
