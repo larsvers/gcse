@@ -9,7 +9,7 @@ window.g = window.g || {};
 
 // (1) load data
 
-var data = d3.csv("/data/gcse.csv", function(data){
+var data = d3.csv("data/gcse.csv", function(data){
 	
 	// log(data);
 	dataprep(data);
