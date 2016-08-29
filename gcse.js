@@ -274,6 +274,10 @@ vis.build = (function() {
 })();
 
 
+
+// interactivity
+// -------------
+
 var text = {};
 
 text.startValuearchie = 'Archie took a total of 10 examns...';
@@ -336,8 +340,6 @@ d3.selectAll('button.story').on('mousedown', function() {
 
 	}
 	
-	log(g.variable);
-
 	if(g.variable === 'startValue'){
 
 		d3.selectAll('.y.axis text').style('fill', '#444');
@@ -429,8 +431,6 @@ d3.selectAll('button.story#prepared').on('mousedown', function() {
 
 
 });
-
-
 
 
 d3.select('#start').on('mousedown', function(d) {
