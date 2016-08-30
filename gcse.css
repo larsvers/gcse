@@ -110,8 +110,8 @@ span#fontchange {
 
 .prequel {
 
-	display: none;
-	/* display: flex; */
+	/* display: none; */
+	display: flex;
 	flex-direction: column;
 	align-items: center;
 	justify-content: center;
@@ -120,8 +120,8 @@ span#fontchange {
 
 
 #container {
-	/* display: none; */
-	display: flex;
+	display: none;
+	/* display: flex; */
 	height: 100%;
 	flex-direction: column;
 	align-items: center;
