@@ -129,8 +129,6 @@ vis.build = (function() {
 
 		// (4) build vis 1 - grades by subject
 
-		// log(g.dataVisOneA, g.dataVisOneS);
-
 		// canvas
 		var margin = { top: 50, right: 20, bottom: 70, left: 50 };
 		width = 1000 - margin.left - margin.right;
@@ -178,11 +176,16 @@ vis.build = (function() {
 
 		scaleX.domain(g.dataVisOne[student].map(function(el) { return el.subject; }));
 
+		var n = g.dataVisOne[student].length;
+		var dur = 1000; 	
+
 		
 		// (4c) update the axes
 
 		svg.select('.x.axis')
-				.transition()
+			.transition()
+			.duration(dur)
+			.delay(function(d,i) { return i * dur / n })
 				.call(axisX);
 		
 		d3.selectAll('g.x.axis > g.tick > text')
@@ -191,17 +194,12 @@ vis.build = (function() {
 
 		// (4d) chart 
 
-		var n = g.dataVisOne[student].length;
-		var dur = 1000; 	
-
-
-
 		// lines
 		// -------
 
 		// join
 		lines = svg
-				.selectAll('lines')
+				.selectAll('.lines')
 				.data(g.dataVisOne[student], function(d) { return d.subject; });
 
 		// enter
@@ -214,21 +212,24 @@ vis.build = (function() {
 
 		// update
 		lines
-				.transition()
-				.duration(dur)
-				.delay(function(d,i) { return i * dur / n })
+			.transition()
+			.duration(dur)
+			.delay(function(d,i) { return i * dur / n })
 				.attr('x1', function(d) { return scaleX(d.subject); })
 				.attr('x2', function(d) { return scaleX(d.subject); })
 				.attr('y2', function(d) { return scaleY(d[variable]); })
 				.style('stroke', g.variable === 'gradeNumber' ? '#FFD700' : '#ccc');
 
 
-		// exit
-		d3.selectAll('.lines:not(.' + student + ')')
-				.transition()
-				.attr('y2', scaleY(0))
+		// // exit
+		lines
+				.exit()
+			.transition()
+			.duration(dur)	
+			.delay(function(d,i) { return i * dur / n })
 				.style('opacity', 0)
-				.remove();
+				.remove()
+			
 
 
 		// circles
@@ -236,36 +237,62 @@ vis.build = (function() {
 
 		// join
 		circles = svg
-				.selectAll('circles')
+				.selectAll('.circles')
 				.data(g.dataVisOne[student], function(d) { return d.subject; });
 
 		// enter
 		circles
 				.enter()
 			.append('circle')
-				.attr('class', function(d) { return 'circles ' + student + ' ' + variable; })
-				.attr('cx', scaleX(0))
+				// .attr('class', function(d) { return 'circles ' + student + ' ' + variable; })
+				.attr('class', function(d) { return 'circles ' + student; })
+				.attr('cx', function(d) { return scaleX(d.subject); })
 				.attr('cy', scaleY(0))
 				.attr('r', 5)
-				.style('opacity', 0);
+				.style('fill', '#444')
+			.transition()
+			.duration(dur)
+			.delay(function(d,i) { return i * dur / n; })
+				.attr('cy', function(d) { return scaleY(d[variable]); })
+				.attr('r', 5)
+				.style('fill', '#ccc');
 
 		// update
 		circles
-				.transition()
-				.duration(dur)
-				.delay(function(d,i) { return i * dur / n })
+			.transition()
+			.duration(dur)
+			.delay(function(d,i) { return i * dur / n; })
 				.attr('cx', function(d) { return scaleX(d.subject); })
 				.attr('cy', function(d) { return scaleY(d[variable]); })
-				.style('opacity', 1)
-				.style('fill', g.variable === 'gradeNumber' ? '#FFD700' : '#ccc');
+				.style('fill', g.variable === 'gradeNumber' ? '#FFD700' : '#ccc')
+				.attr('r', function() { if(variable !== 'prepared') return 5; });
 
-
-		// exit (self written as bloody exit() didn't work)
-		d3.selectAll('.circles:not(.' + student + ')')
-				.transition()
-				.attr('cy', scaleY(0))
-				.style('opacity', 0)
+		// exit
+		circles.exit()
+			.transition()
+			.duration(dur)
+				.style('opacity', 1e-6)
 				.remove();
+				
+
+		if (g.variable == 'expNumber') {
+
+			
+			avgGradeCircles = svg
+					.selectAll('.avgGradeCircles')
+					.data(g.dataVisOne[student].map(function(el) { return { 'avgGradeNumber': el.avgGradeNumber, 'subject': el.subject }; }))
+					.enter()
+				.append('circle')
+					.attr('class', 'avgGradeCircles ' + student)
+					.attr('cx', function(d) { return scaleX(d.subject); })
+					.attr('cy', function(d) { return scaleY(d.avgGradeNumber); })
+					.attr('r', '5px')
+					.style('fill', '#ccc')
+				.transition()
+				.duration(dur)
+					.style('fill', 'steelblue');
+
+		}
 
 	}
 
@@ -305,6 +332,16 @@ d3.selectAll('button.student').on('mousedown', function() {
 	d3.selectAll('button.story').classed('pressed', false);
 	d3.select('button#startValue').classed('pressed', true);
 
+	d3.selectAll('.circles').classed('allowTip', false);
+	d3.selectAll('.circles').on('mouseover', null); // removes the .allowTip mouseover set up for the 'prepared' circles
+
+	d3.selectAll('.avgGradeCircles')
+		.transition()
+		.duration(500)
+			.attr('r', 5)
+			.style('opacity', 0)
+			.remove();
+
 	vis.build.update(g.student, g.variable);
 
 });
@@ -313,41 +350,23 @@ d3.selectAll('button.student').on('mousedown', function() {
 d3.selectAll('button.story').on('mousedown', function() {
 
 	g.variable = d3.select(this).attr('id');
-
-	d3.selectAll('.lines')
-			.transition()
-			.style('opacity', 0)
-			.remove();
-
-
-	if (g.variable == 'startValue') {
-
-		d3.selectAll('.circles')
-				.transition()
-				.style('opacity', 0)
-				.remove();
-
-	} else {
-
-		d3.selectAll('.circles:not(.avgGradeNumber)')
-				.transition()
-				.style('opacity', 0)
-				.remove();
-
-		d3.selectAll('.circles.avgGradeNumber')
-			.transition()
-			.style('fill', 'steelblue');
-
-	}
 	
 	if(g.variable === 'startValue'){
 
 		d3.selectAll('.y.axis text').style('fill', '#444');
 		d3.selectAll('.y.axis line').style('stroke', '#444');
 
-	} else if(g.variable === 'avgGradeNumber') {
+		d3.selectAll('.circles').classed('allowTip', false);
+		d3.selectAll('.circles').on('mouseover', null); // removes the .allowTip mouseover set up for the 'prepared' circles
 
-		// log(d3.select('.y.axis text').style('fill'));
+		d3.selectAll('.avgGradeCircles')
+			.transition()
+			.duration(500)
+				.attr('r', 5)
+				.style('opacity', 0)
+				.remove();
+
+	} else if(g.variable === 'avgGradeNumber') {
 
 		d3.selectAll('.y.axis text').transition().duration(1000).style('fill', '#eee');
 		d3.selectAll('.y.axis line').transition().duration(1000).style('stroke', '#555');
@@ -361,10 +380,8 @@ d3.selectAll('button.story').on('mousedown', function() {
 
 	g.variable === 'startValue' ? d3.select('div#text').html(text[g.variable + g.student]) : d3.select('div#text').html(text[g.variable]);
 
-
 	d3.selectAll('button.story').classed('pressed', false);
 	d3.select(this).classed('pressed', true);
-
 
 	vis.build.update(g.student, g.variable);
 	
@@ -374,14 +391,14 @@ d3.selectAll('button.story').on('mousedown', function() {
 
 d3.selectAll('button.story#prepared').on('mousedown', function() {
 
-	d3.selectAll('.circles:not(.avgGradeNumber)')
-			.transition()
-			.duration(2000)
-			.ease('elastic')
+	d3.selectAll('.circles:not(.avgGradeCircles)')
+		.transition()
+		.duration(2000)
+		.ease('elastic')
 			.attr('r', function(d) { return scaleZ(d.prepared); })
 			.style('fill', function(d) { return scaleZCol(d.prepared); });
 
-	d3.selectAll('.circles:not(.avgGradeNumber)')
+	d3.selectAll('.circles:not(.avgGradeCircles)')
 			.classed('allowTip', true);
 
 	d3.selectAll('.lines')
@@ -392,8 +409,7 @@ d3.selectAll('button.story#prepared').on('mousedown', function() {
 	d3.selectAll('button.story').classed('pressed', false);
 	d3.select(this).classed('pressed', true);
 
-
-
+	
 	d3.selectAll('.allowTip').on('mouseover', function(d,i) {
 
 		var tooltipText = 
@@ -404,20 +420,20 @@ d3.selectAll('button.story#prepared').on('mousedown', function() {
 			<p class="tooltipText">Prepared: ' + d.prepared + ' minutes</p>';
 
 		d3.select('div.tooltip')
-			.style('left', (d3.event.pageX + 5) + 'px')
-			.style('top', (d3.event.pageY + 5) + 'px')
-			.html(tooltipText)
-			.style('opacity', 0)
+				.style('left', (d3.event.pageX + 5) + 'px')
+				.style('top', (d3.event.pageY + 5) + 'px')
+				.html(tooltipText)
+				.style('opacity', 0)
 			.transition()
-			.style('opacity', .8); // build and show tooltip 
+				.style('opacity', .8); // build and show tooltip 
 
 	});
 
 	d3.selectAll('.allowTip').on('mousemove', function() {
 
 		d3.select('div.tooltip')
-			.style('left', (d3.event.pageX + 5) + 'px')
-			.style('top', (d3.event.pageY + 5) + 'px');
+				.style('left', (d3.event.pageX + 5) + 'px')
+				.style('top', (d3.event.pageY + 5) + 'px');
 
 	});
 
@@ -425,10 +441,9 @@ d3.selectAll('button.story#prepared').on('mousedown', function() {
 
 		d3.select('div.tooltip')
 			.transition()
-			.style('opacity', 0); // build and show tooltip 
+				.style('opacity', 0); // build and show tooltip 
 
 	});
-
 
 });
 
@@ -438,7 +453,7 @@ d3.select('#start').on('mousedown', function(d) {
 	d3.selectAll('.prequel > div')
 		.transition()
 		.duration(2000)
-		.style('color', '#444');
+			.style('color', '#444');
 
 	setTimeout(function() {
 
@@ -447,12 +462,12 @@ d3.select('#start').on('mousedown', function(d) {
 
 		d3.select('#container')
 			.append('div')
-			.classed('cover', true)
+				.classed('cover', true)
 			.transition()
 			.duration(1000)
 			.style('opacity', 0);
 
-		setTimeout(function() {
+setTimeout(function() {
 			d3.select('div.cover').style('display', 'none');
 		}, 1200);
 
