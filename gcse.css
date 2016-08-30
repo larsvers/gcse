@@ -110,8 +110,8 @@ span#fontchange {
 
 .prequel {
 
-	/*display: none;*/
-	display: flex;
+	display: none;
+	/* display: flex; */
 	flex-direction: column;
 	align-items: center;
 	justify-content: center;
@@ -120,9 +120,9 @@ span#fontchange {
 
 
 #container {
-	display: none;
+	/* display: none; */
+	display: flex;
 	height: 100%;
-	/*display: flex;*/
 	flex-direction: column;
 	align-items: center;
 	justify-content: center;
@@ -133,6 +133,7 @@ span#fontchange {
 	margin: 15px;
 	font-size: 2em;
 	color: #444;
+	text-align: center;
 
 }
 
@@ -179,7 +180,6 @@ div.tooltip {
   background-color: #fff;
 	border: 1px solid #999;
 	border-radius: 2px;
-	text-align: center;
   pointer-events: none;
 	opacity: 0;
 	z-index: 2;
