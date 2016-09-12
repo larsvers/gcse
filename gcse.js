@@ -220,8 +220,7 @@ vis.build = (function() {
 				.attr('y2', function(d) { return scaleY(d[variable]); })
 				.style('stroke', g.variable === 'gradeNumber' ? '#FFD700' : '#ccc');
 
-
-		// // exit
+		// exit
 		lines
 				.exit()
 			.transition()
